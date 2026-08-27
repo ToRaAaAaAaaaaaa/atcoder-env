@@ -1,0 +1,9 @@
+# ここは atcoder-cli の設定ディレクトリ。既定で全部無視し、環境の中核だけを追跡する。
+# （session.json = AtCoderログイン情報、解答フォルダ、icpc2026/ などを公開しないため）
+/*
+!/.gitignore
+!/README.md
+!/python/
+/python/*
+!/python/main.py
+!/python/new.sh
