@@ -8,7 +8,7 @@ Mac / Linux / WSL / Git Bash のどこでも動く（bash 3.2 以上）。
 ```sh
 git clone https://github.com/ToRaAaAaAaaaaaa/atcoder-env.git
 cd atcoder-env/python
-bash new.sh probA          # probA/main.py と probA/tests/ ができる
+bash new.sh probA          # probA/main.py と probA/tests/ ができる（注釈なし版が入る）
 ```
 
 `tests/sample-1.in` / `sample-1.out` にサンプルを貼って実行:
@@ -30,6 +30,15 @@ oj t -c "python3 main.py" -d tests/
 ```sh
 bash new.sh arc180/a yuki/1234
 ```
+
+## ファイル
+
+| ファイル | 中身 |
+|---|---|
+| `python/main.py` | テンプレ本体（**説明つき**。何が使えるか調べる用） |
+| `python/main_bare.py` | 同じ中身から docstring と `#` コメントを除いた版（**生成に使われる**のはこっち） |
+| `python/mkbare.py` | `main.py` を編集したら `python3 mkbare.py` で `main_bare.py` を更新 |
+| `python/new.sh` | 問題フォルダを作る |
 
 ## テンプレート (`python/main.py`) の中身
 

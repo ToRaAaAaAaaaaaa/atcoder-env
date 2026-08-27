@@ -7,3 +7,5 @@
 /python/*
 !/python/main.py
 !/python/new.sh
+!/python/main_bare.py
+!/python/mkbare.py

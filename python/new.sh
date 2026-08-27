@@ -7,12 +7,14 @@
 #   相対パスはこのスクリプトのある場所が基準。絶対パスを渡せばそこに作る。
 #   既に main.py がある場所は上書きしない。
 #
+# 生成される main.py は注釈なし版（main_bare.py）。中身の説明つきは main.py を参照。
 # サンプルは tests/sample-1.in / sample-1.out に貼る（連番で増やせる）。
 # online-judge-tools があれば: oj d <問題URL> -d <フォルダ>/tests/
 set -eu
 
 script_dir="$(cd "$(dirname "$0")" && pwd)"
-template="$script_dir/main.py"
+template="$script_dir/main_bare.py"          # 注釈(docstring/コメント)なし版を使う
+[ -f "$template" ] || template="$script_dir/main.py"
 
 if [ "$#" -eq 0 ]; then
     sed -n '2,12p' "$0" >&2

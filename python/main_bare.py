@@ -1,0 +1,415 @@
+'''
+cd "__DIR__" && oj t -c "uv run --with sortedcontainers --with 'git+https://github.com/not522/ac-library-python' python main.py" -d ./tests/
+zsh "$HOME/Library/Preferences/atcoder-cli-nodejs/python/addtest.sh" "__DIR__"
+'''
+
+import math
+from collections import deque, defaultdict, Counter
+from heapq import heappop, heappush, heapify
+from bisect import bisect_left, bisect_right, insort
+import sys
+from itertools import permutations, combinations, product, accumulate
+
+sys.setrecursionlimit(1 << 20)
+INF = 1 << 60
+DIJ4 = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+DIJ8 = [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]
+
+try:
+    from atcoder.dsu import DSU
+    from atcoder.fenwicktree import FenwickTree
+    from atcoder.segtree import SegTree
+    from atcoder.lazysegtree import LazySegTree
+except ImportError:
+    pass
+
+class BinarySearch:
+    @staticmethod
+    def meguru(ng, ok, check):
+        while abs(ok - ng) > 1:
+            mid = (ok + ng) // 2
+            if check(mid):
+                ok = mid
+            else:
+                ng = mid
+        return ok
+
+    @staticmethod
+    def real(ng, ok, check, loop=100):
+        for _ in range(loop):
+            mid = (ok + ng) / 2
+            if check(mid):
+                ok = mid
+            else:
+                ng = mid
+        return ok
+
+    @staticmethod
+    def count_in(a, left, right):
+        return bisect_right(a, right) - bisect_left(a, left)
+
+class BFS:
+    INF = 1 << 60
+
+    @staticmethod
+    def grid(a, starts, h, w, diag=False, wall=ord("#")):
+        INF = BFS.INF
+        H, W = h + 2, w + 2
+        size = H * W
+        D = [INF] * size
+        block = bytearray(size)
+        for i in range(W):
+            block[i] = 1
+            block[(H - 1) * W + i] = 1
+        for i in range(H):
+            block[i * W] = 1
+            block[i * W + W - 1] = 1
+        for i in range(h):
+            base = (i + 1) * W + 1
+            row = a[i]
+            for j in range(w):
+                if row[j] == wall:
+                    block[base + j] = 1
+        flat_dirs = [-1, -W - 1, -W, -W + 1, 1, W + 1, W, W - 1] if diag else [-1, -W, 1, W]
+        Q = deque()
+        for i, j in starts:
+            pos = (i + 1) * W + (j + 1)
+            if not block[pos]:
+                D[pos] = 0
+                Q.append(pos)
+        while Q:
+            pos = Q.popleft()
+            d = D[pos] + 1
+            for fd in flat_dirs:
+                npos = pos + fd
+                if D[npos] == INF and not block[npos]:
+                    D[npos] = d
+                    Q.append(npos)
+        return D, W
+
+    @staticmethod
+    def graph(adj, starts, n):
+        INF = BFS.INF
+        D = [INF] * n
+        Q = deque()
+        for s in starts:
+            if D[s] == INF:
+                D[s] = 0
+                Q.append(s)
+        while Q:
+            v = Q.popleft()
+            d = D[v] + 1
+            for u in adj[v]:
+                if D[u] == INF:
+                    D[u] = d
+                    Q.append(u)
+        return D
+
+class Graph:
+
+    def __init__(self, n):
+        self.n = n
+        self.adj = [[] for _ in range(n)]
+
+    def add(self, u, v):
+        u -= 1
+        v -= 1
+        self.adj[u].append(v)
+        self.adj[v].append(u)
+
+    def bfs(self, *starts):
+        return BFS.graph(self.adj, [s - 1 for s in starts], self.n)
+
+    def dfs(self, start):
+        s = start - 1
+        par = [-1] * self.n
+        visited = [False] * self.n
+        visited[s] = True
+        order = []
+        stack = [s]
+        while stack:
+            v = stack.pop()
+            order.append(v + 1)
+            for u in self.adj[v]:
+                if not visited[u]:
+                    visited[u] = True
+                    par[u] = v
+                    stack.append(u)
+        return order, par
+
+class WGraph:
+
+    def __init__(self, n):
+        self.n = n
+        self.adj = [[] for _ in range(n)]
+
+    def add(self, u, v, w, directed=False):
+        u -= 1
+        v -= 1
+        self.adj[u].append((v, w))
+        if not directed:
+            self.adj[v].append((u, w))
+
+    def dijkstra(self, start):
+        D = [INF] * self.n
+        s = start - 1
+        D[s] = 0
+        q = [(0, s)]
+        while q:
+            d, v = heappop(q)
+            if d > D[v]:
+                continue
+            for u, w in self.adj[v]:
+                nd = d + w
+                if nd < D[u]:
+                    D[u] = nd
+                    heappush(q, (nd, u))
+        return D
+
+class Comb:
+
+    def __init__(self, n, mod=998244353):
+        self.mod = mod
+        f = [1] * (n + 1)
+        for i in range(1, n + 1):
+            f[i] = f[i - 1] * i % mod
+        inv = [1] * (n + 1)
+        inv[n] = pow(f[n], -1, mod)
+        for i in range(n, 0, -1):
+            inv[i - 1] = inv[i] * i % mod
+        self.f = f
+        self.finv = inv
+
+    def C(self, n, k):
+        if k < 0 or k > n:
+            return 0
+        return self.f[n] * self.finv[k] % self.mod * self.finv[n - k] % self.mod
+
+    def P(self, n, k):
+        if k < 0 or k > n:
+            return 0
+        return self.f[n] * self.finv[n - k] % self.mod
+
+    def H(self, n, k):
+        if n == 0 and k == 0:
+            return 1
+        return self.C(n + k - 1, k)
+
+def sieve(n):
+    if n < 2:
+        return []
+    is_p = bytearray([1]) * (n + 1)
+    is_p[0] = is_p[1] = 0
+    for i in range(2, int(n ** 0.5) + 1):
+        if is_p[i]:
+            is_p[i * i::i] = bytearray(len(is_p[i * i::i]))
+    return [i for i in range(n + 1) if is_p[i]]
+
+def factorize(x):
+    res = {}
+    d = 2
+    while d * d <= x:
+        while x % d == 0:
+            res[d] = res.get(d, 0) + 1
+            x //= d
+        d += 1 if d == 2 else 2
+    if x > 1:
+        res[x] = res.get(x, 0) + 1
+    return res
+
+def divisors(x):
+    small = []
+    large = []
+    d = 1
+    while d * d <= x:
+        if x % d == 0:
+            small.append(d)
+            if d * d != x:
+                large.append(x // d)
+        d += 1
+    return small + large[::-1]
+
+def is_prime(n):
+    if n < 2:
+        return False
+    for p in (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37):
+        if n % p == 0:
+            return n == p
+    d = n - 1
+    r = 0
+    while d % 2 == 0:
+        d //= 2
+        r += 1
+    for a in (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37):
+        x = pow(a, d, n)
+        if x == 1 or x == n - 1:
+            continue
+        for _ in range(r - 1):
+            x = x * x % n
+            if x == n - 1:
+                break
+        else:
+            return False
+    return True
+
+def toposort(n, edges):
+    adj = [[] for _ in range(n + 1)]
+    deg = [0] * (n + 1)
+    for u, v in edges:
+        adj[u].append(v)
+        deg[v] += 1
+    Q = deque(v for v in range(1, n + 1) if deg[v] == 0)
+    order = []
+    while Q:
+        v = Q.popleft()
+        order.append(v)
+        for u in adj[v]:
+            deg[u] -= 1
+            if deg[u] == 0:
+                Q.append(u)
+    return order if len(order) == n else None
+
+def lis(a, strict=True):
+    b = bisect_left if strict else bisect_right
+    tails = []
+    for x in a:
+        i = b(tails, x)
+        if i == len(tails):
+            tails.append(x)
+        else:
+            tails[i] = x
+    return len(tails)
+
+def mat_mul(A, B, mod=0):
+    n, m, l = len(A), len(B[0]), len(B)
+    C = [[0] * m for _ in range(n)]
+    for i in range(n):
+        Ai = A[i]
+        Ci = C[i]
+        for k in range(l):
+            a = Ai[k]
+            if a:
+                Bk = B[k]
+                for j in range(m):
+                    Ci[j] += a * Bk[j]
+        if mod:
+            for j in range(m):
+                Ci[j] %= mod
+    return C
+
+def mat_pow(A, k, mod=0):
+    n = len(A)
+    R = [[1 if i == j else 0 for j in range(n)] for i in range(n)]
+    while k:
+        if k & 1:
+            R = mat_mul(R, A, mod)
+        A = mat_mul(A, A, mod)
+        k >>= 1
+    return R
+
+def cross(o, a, b):
+    return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+def dot(o, a, b):
+    return (a[0] - o[0]) * (b[0] - o[0]) + (a[1] - o[1]) * (b[1] - o[1])
+
+def seg_intersect(p1, p2, p3, p4):
+    d1 = cross(p3, p4, p1)
+    d2 = cross(p3, p4, p2)
+    d3 = cross(p1, p2, p3)
+    d4 = cross(p1, p2, p4)
+    if ((d1 > 0 > d2) or (d1 < 0 < d2)) and ((d3 > 0 > d4) or (d3 < 0 < d4)):
+        return True
+
+    def on(p, q, r):
+        return min(p[0], r[0]) <= q[0] <= max(p[0], r[0]) and min(p[1], r[1]) <= q[1] <= max(p[1], r[1])
+    if d1 == 0 and on(p3, p1, p4):
+        return True
+    if d2 == 0 and on(p3, p2, p4):
+        return True
+    if d3 == 0 and on(p1, p3, p2):
+        return True
+    if d4 == 0 and on(p1, p4, p2):
+        return True
+    return False
+
+def convex_hull(pts):
+    pts = sorted(set(map(tuple, pts)))
+    if len(pts) <= 2:
+        return pts
+    lo = []
+    for p in pts:
+        while len(lo) >= 2 and cross(lo[-2], lo[-1], p) <= 0:
+            lo.pop()
+        lo.append(p)
+    hi = []
+    for p in reversed(pts):
+        while len(hi) >= 2 and cross(hi[-2], hi[-1], p) <= 0:
+            hi.pop()
+        hi.append(p)
+    return lo[:-1] + hi[:-1]
+
+def output(a):
+    return sys.stdout.write(a)
+def Yes():
+    return output("".join("Yes") + "\n")
+def No():
+    return output("".join("No") + "\n")
+def Print(a):
+    return output("".join(a) + "\n")
+def OR(a, b):
+    return a | b
+def AND(a, b):
+    return a & b
+def XOR(a, b):
+    return a ^ b
+def popcount(x):
+    return bin(x).count("1")
+def two_pointers(l, r, A):
+    return A[r+1] - A[l]
+def haepque(a):
+    return heapify(a)
+def rev(a):
+    return a[::-1]
+def cut(a, l, r):
+    return a[l:r + 1]
+def cut_out(a, l, r):
+    return a[:l] + a[r + 1:]
+
+def char(n):
+    return chr(n)
+def code(c):
+    return ord(c)
+
+def base_conv(a, b, c):
+    n = int(a) if b == 10 else int(str(a), b)
+    if c == 2:
+        return format(n, "b")
+    if c == 16:
+        return format(n, "X")
+    if c == 8:
+        return format(n, "o")
+    if c == 10:
+        return str(n)
+    if n == 0:
+        return "0"
+    sign = "-" if n < 0 else ""
+    n = abs(n)
+    digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    res = []
+    while n:
+        n, r = divmod(n, c)
+        res.append(digits[r])
+    res.reverse()
+    return sign + "".join(res)
+
+data = sys.stdin.buffer.read().split()
+_it = iter(data)
+def nx():
+    return int(next(_it))
+def nxs():
+    return next(_it).decode()
+def nexts(n):
+    return [int(next(_it)) for _ in range(n)]
+def nextstr(n):
+    return [next(_it).decode() for _ in range(n)]
