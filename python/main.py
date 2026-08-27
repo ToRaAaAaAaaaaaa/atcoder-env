@@ -468,12 +468,6 @@ def char(n):
 def code(c):
     """文字 -> 数。code('a') -> 97   ※中身は ord(c)"""
     return ord(c)
-def alpha(i, upper=False):
-    """0始まりの番号 -> アルファベット。alpha(0)='a', alpha(2, upper=True)='C'"""
-    return chr(i + (65 if upper else 97))
-def alpha_index(c):
-    """アルファベット -> 0始まりの番号。alpha_index('c')=2, alpha_index('C')=2"""
-    return ord(c) - (65 if c.isupper() else 97)
 
 # --- 進数変換 ---
 def base_conv(a, b, c):
