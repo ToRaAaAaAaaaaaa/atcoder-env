@@ -469,7 +469,16 @@ def base_conv(a, b, c):
     例) base_conv("ff", 16, 2) -> '11111111' / base_conv(255, 10, 16) -> 'FF'
         base_conv(6, 10, 2) -> '110' / base_conv("110", 2, 10) -> '6'
     ※ 数として使いたいときは int(base_conv(...), c) か、b進数->10進数だけなら int(str(a), b)"""
-    n = int(str(a), b)
+    n = int(a) if b == 10 else int(str(a), b)
+    # 2/8/10/16 は組み込みに任せる（format(x,"b") と同等の速さ）。それ以外だけ除算ループ。
+    if c == 2:
+        return format(n, "b")
+    if c == 16:
+        return format(n, "X")
+    if c == 8:
+        return format(n, "o")
+    if c == 10:
+        return str(n)
     if n == 0:
         return "0"
     sign = "-" if n < 0 else ""
