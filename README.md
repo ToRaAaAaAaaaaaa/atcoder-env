@@ -40,9 +40,13 @@ bash new.sh arc180/a yuki/1234
 | グラフ | `Graph`（BFS/反復DFS） / `WGraph`（ダイクストラ） / `BFS.grid`（番兵パディングの多点BFS） |
 | 探索 | `BinarySearch.meguru`（めぐる式） `.real` `.count_in` |
 | 数学 | `Comb`（mod nCk/nPk/nHk） `sieve` `factorize` `divisors` `is_prime`（Miller-Rabin・64bit） |
+| 文字 | `char(n)`=chr / `code(c)`=ord / `alpha(i)`（0→'a'） / `alpha_index(c)`（'c'→2） |
+| 進数 | `base_conv(a, b, c)`（b進数の a を c進数の文字列に。`base_conv("ff",16,2)`→`'11111111'`） |
+| リスト | `rev(a)`（反転） / `cut(a,l,r)`（l〜r を切り出し・両端含む） / `cut_out(a,l,r)`（除いた残り） |
 | その他 | `toposort` `lis` `mat_pow` / 幾何 `cross` `dot` `seg_intersect` `convex_hull` |
 | 定数 | `INF` `DIJ4` `DIJ8` |
 
+- 素の `nCk` は `math.comb(n, k)` でOK（mod を取るなら `Comb` クラス）
 - **グラフの頂点は 1-indexed 統一**（AtCoder の入力をそのまま `g.add(u, v)` に渡せる）
 - `from atcoder...`（ACL）は AtCoder ジャッジに標準装備されている前提。ローカルで使うなら
   `pip install git+https://github.com/not522/ac-library-python`。

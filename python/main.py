@@ -461,6 +461,40 @@ def cut_out(a, l, r):
     例) cut_out([0, 1, 2, 3, 4], 1, 3) -> [0, 4]"""
     return a[:l] + a[r + 1:]
 
+# --- 文字と数（chr / ord を忘れる用）---
+def char(n):
+    """数 -> 文字。char(97) -> 'a'   ※中身は chr(n)"""
+    return chr(n)
+def code(c):
+    """文字 -> 数。code('a') -> 97   ※中身は ord(c)"""
+    return ord(c)
+def alpha(i, upper=False):
+    """0始まりの番号 -> アルファベット。alpha(0)='a', alpha(2, upper=True)='C'"""
+    return chr(i + (65 if upper else 97))
+def alpha_index(c):
+    """アルファベット -> 0始まりの番号。alpha_index('c')=2, alpha_index('C')=2"""
+    return ord(c) - (65 if c.isupper() else 97)
+
+# --- 進数変換 ---
+def base_conv(a, b, c):
+    """b進数の a を c進数の文字列にして返す（2<=b,c<=36）。a は文字列でも整数でもOK。
+    10以上の桁は A,B,C... で表す。負数・0 も可。
+    例) base_conv("ff", 16, 2) -> '11111111' / base_conv(255, 10, 16) -> 'FF'
+        base_conv(6, 10, 2) -> '110' / base_conv("110", 2, 10) -> '6'
+    ※ 数として使いたいときは int(base_conv(...), c) か、b進数->10進数だけなら int(str(a), b)"""
+    n = int(str(a), b)
+    if n == 0:
+        return "0"
+    sign = "-" if n < 0 else ""
+    n = abs(n)
+    digits = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    res = []
+    while n:
+        n, r = divmod(n, c)
+        res.append(digits[r])
+    res.reverse()
+    return sign + "".join(res)
+
 data = sys.stdin.buffer.read().split()
 _it = iter(data)
 def nx():
