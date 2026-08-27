@@ -434,13 +434,6 @@ def AND(a, b):
     return a & b
 def XOR(a, b):
     return a ^ b
-def to_bin(x, w=0):
-    """整数を2進文字列に変換（'0b' なし）。w を指定するとその桁数まで0埋め。
-    例) to_bin(10) -> '1010' / to_bin(10, 8) -> '00001010'"""
-    return format(x, "0" + str(w) + "b") if w else format(x, "b")
-def from_bin(s):
-    """2進文字列を整数に戻す。例) from_bin('1010') -> 10"""
-    return int(s, 2)
 def popcount(x):
     """立っているビットの個数。例) popcount(10) -> 2"""
     return bin(x).count("1")
