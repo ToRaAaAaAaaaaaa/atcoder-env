@@ -1,9 +1,10 @@
 '''
-cd "__DIR__" && oj t -c "uv run --with sortedcontainers --with 'git+https://github.com/not522/ac-library-python' python main.py" -d ./tests/
+cd "__DIR__" && oj t -c "uv run --with networkx==3.5 --with sortedcontainers --with 'git+https://github.com/not522/ac-library-python' python main.py" -d ./tests/
 zsh "$HOME/Library/Preferences/atcoder-cli-nodejs/python/addtest.sh" "__DIR__"
 '''
 
 import math
+import networkx
 from collections import deque, defaultdict, Counter
 from heapq import heappop, heappush, heapify
 from bisect import bisect_left, bisect_right, insort

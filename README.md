@@ -31,6 +31,33 @@ oj t -c "python3 main.py" -d tests/
 bash new.sh arc180/a yuki/1234
 ```
 
+## NetworkX をローカルで使う
+
+以下は `python/` 内で実行する。`uv` がインストール済みで、練習用の `.venv` がすでにある場合は、そこへ NetworkX 3.5 を追加する。
+
+```sh
+uv pip install --python .venv/bin/python networkx==3.5
+.venv/bin/python probA/main.py < probA/tests/sample-1.in
+```
+
+PyPy でも使う場合は、`/opt/homebrew/bin/pypy3` がインストール済みの環境で専用の仮想環境を作る。
+
+```sh
+uv venv --python /opt/homebrew/bin/pypy3 .venv-pypy
+uv pip install --python .venv-pypy/bin/python networkx==3.5
+.venv-pypy/bin/python probA/main.py < probA/tests/sample-1.in
+```
+
+テンプレート冒頭の `uv run --with ...` コマンドにも NetworkX 3.5 を指定している。NetworkX は `networkx` という名前で使う。
+
+```python
+import networkx
+
+g = networkx.Graph()
+g.add_weighted_edges_from([(1, 2, 3), (2, 3, 4)])
+print(networkx.single_source_dijkstra_path_length(g, 1))
+```
+
 ## ファイル
 
 | ファイル | 中身 |
